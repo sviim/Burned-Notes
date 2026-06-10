@@ -1,7 +1,7 @@
 # Summary
 
 ## Active Directory
-* [LLMNR & NBT-NS Poisoning](active-directory/llmnr-nbtns-poisoning/index.md)
+* [LLMNR & NBT-NS Poisoning](active-directory/LLMR-Poisoning-Writeup/index.md)
 
 ## Web Application
 * [Coming soon](README.md)
