@@ -9,7 +9,7 @@ categories: ["Active Directory Attacks"]
 
 Before diving into the attack, we need to understand how NTLM authentication works:
 
-```
+```c
 Cliente                    Servidor
   |                           |
   |---(1) NEGOTIATE---------->|
