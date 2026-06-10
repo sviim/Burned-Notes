@@ -151,7 +151,7 @@ Computer Configuration
 
 Per network adapter:
 
-```
+```c
 Network Adapter Properties
 → IPv4 → Advanced → WINS
 → "Disable NetBIOS over TCP/IP"
