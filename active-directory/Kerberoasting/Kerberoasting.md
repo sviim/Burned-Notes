@@ -38,13 +38,21 @@ The ST identifies **who YOU are** to the service, not the other way around. Insi
 All of that is encrypted with the service account's hash. When SQL Server decrypts the ST using its own password, it reads your identity from inside and knows who you are, not the other way around.
 ## Attack Flow
 As attackers, we first enumerate accounts with an `SPN` across the entire `AD`. We use `GetUserSPNs.py` for this:
+
 ![](images/Pasted-image-20260609205008.png)
+
 With this tool we can easily enumerate accounts with SPNs:
+
 ![](images/Pasted-image-20260609205144.png)
+
 We request a `ST` for that service account using `-request-user`:
+
 ![](images/Pasted-image-20260609205246.png)
+
 We save it and run it through hashcat with mode `13100` (Kerberos 5 TGS-REP etype 23):
+
 ![](images/Pasted-image-20260609205450.png)
+
 If we're lucky, we'll be able to crack it.
 ## Notes
 This is much harder to pull off in a real environment, strong service account passwords or properly configured SPNs will usually stop the attack. But understanding Kerberoasting is essential groundwork for understanding more advanced attacks built on top of it.
