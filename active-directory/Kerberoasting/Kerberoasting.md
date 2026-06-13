@@ -1,3 +1,5 @@
+# Kerberoasting
+
 To summarize: practically any domain user can request a Service Granting Ticket for any service account that has an SPN. That ticket is encrypted with the service account's hash. The attacker takes it offline and cracks it, the weak point is the service account's password
 ## Quick Kerberos Recap
 ### AS = Authentication Service
