@@ -159,12 +159,17 @@ After all this theory, let's quickly set up a Lab to practice `Coercion`. The fi
 - The worst-case scenario is `SMB Signing OFF + LDAP Signing/Channel Binding OFF + AD CS` exposed. With that, from a normal unprivileged user account we can reach Domain Admin in minutes.
 ## Lab 1
 First of all, let's configure everything as if it were a real environment, we will enable `SMB/LDAP Signing`. The only thing we will leave disabled is `LDAP Channel Binding` (remember that this is practically impossible to bypass for now).
+
 ![SMB Signing Policy](images/smb-signing-policy.png)
+
 ![LDAP Signing Policy](images/ldap-signing-policy.png)
+
 In this case we will leave `Channel Binding` at `Not Defined`, which is the default.
 
 And on the victim's `Machine Account` we will have `SMB Signing Outbound & Inbound` enabled:
+
 ![SMB Signing Outbound](images/smb-signing-outbound.png)
+
 - My `Lab` setup is: `Arch Linux` - `Windows 10 Server 2019` - `Windows Enterprise 10`, all running in `VMWare`. The reason for this is that relaying from `DC01$` to itself (LDAP) is blocked by the `MS08-068` patch, so the relay target must strictly be a different server. With that said, let's continue.
 ```cpp
 192.168.20.52 --> DC01$
@@ -172,7 +177,9 @@ And on the victim's `Machine Account` we will have `SMB Signing Outbound & Inbou
 192.168.20.68 --> Arch Linux
 ```
 As attackers we verify that everything is enabled:
+
 ![NXC Verification](images/nxc-verification.png)
+
 At this point we might think we are stuck and cannot perform a `Coercion / NTLM Relay` attack. Or are we?
 
 Let's start Responder listening on our network interface, waiting for requests:
