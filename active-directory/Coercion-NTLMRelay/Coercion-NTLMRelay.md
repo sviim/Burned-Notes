@@ -312,7 +312,7 @@ Let's start the full attack (remember that SMB / LDAP Signing are ON).
 - If we launch `PetitPotam.py`:
 ![PetitPotam No Relay](images/ntlmrelayx-smb-signing-fail.png)
 We can see that `ntlmrelayx` could not relay to `LDAP`. This is because of what we saw earlier, `SMB / LDAP Signing` is being negotiated. Let's use `--remove-mic`.
-![LDAP Signing Error](images/ldap-signing-error.png)
+![LDAP Signing Error](./images/ldap-signing-error.png)
 We get a `'LDAP Signing is enabled'` error, and this is where the second bypass comes in. Let's try bypassing `LDAP Signing` via `LDAPS`:
 ```cpp
 svim @Burned in burned/exploits/poc ❯ sudo ntlmrelayx.py -t 'ldaps://192.168.20.52' --no-dump --delegate-access -smb2support --remove-mic
