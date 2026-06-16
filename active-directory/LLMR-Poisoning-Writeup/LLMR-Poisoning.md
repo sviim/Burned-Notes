@@ -92,7 +92,7 @@ Let's set up a simple lab to see how easy this is in practice. We are on the sam
 
 First, verify connectivity to the DC:
 
-![Ping to DC](../../.gitbook/assets/01-ping-dc.png)
+![Ping to DC](images/01-ping-dc.png)
 
 Check the network interface and start Responder:
 
