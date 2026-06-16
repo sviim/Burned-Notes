@@ -139,4 +139,4 @@ KDC → EVIL$: TGS [Administrator → cifs/DAN-MACHINE$]
 EVIL$ uses that TGS → psexec as Administrator on DAN-MACHINE$
 ```
 
-- For a practical example using S4U2Self & S4U2Proxy, see: [Coercion & NTLMRelay](../coercion-NTLMRelay/Coercion-NTLMRelay.md)
+- For a practical example using S4U2Self & S4U2Proxy, see: [Coercion & NTLMRelay](../Coercion-NTLMRelay/Coercion-NTLMRelay.md)
