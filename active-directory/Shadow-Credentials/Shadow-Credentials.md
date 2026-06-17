@@ -131,7 +131,7 @@ Valid starting       Expires              Service principal
 ```
 And we would have a `ccache` of the `as.rep` user to authenticate via `Kerberos`. We simply configure `/etc/krb5.conf`:
 
-![krb5](/images/krb5conf.png)
+![krb5](images/krb5conf.png)
 
 And we log in with `Evil-WinRM`:
 ```cpp
