@@ -8,6 +8,7 @@
 * [LLMNR & NBT-NS Poisoning](active-directory/LLMR-Poisoning-Writeup/LLMR-Poisoning.md)
 * [Kerberoasting](active-directory/Kerberoasting/Kerberoasting.md)
 * [Shadow Credentials](active-directory/Shadow-Credentials/Shadow-Credentials.md)
+* [SPN Jacking](active-directory/SPN-Jacking/SPN-Jacking.md)
 
 ## Web Application
 * [Coming soon](README.md)
