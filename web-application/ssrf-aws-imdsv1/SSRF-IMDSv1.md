@@ -49,7 +49,7 @@ Press CTRL+C to quit
 ```
 If we test the SSRF:
 
-![SSRF test](SSRF.png)
+![SSRF test](images/SSRF.png)
 
 We can see everything's working fine. Now let's move on to exploitation.
 
@@ -76,11 +76,11 @@ Our flag is going to be that `credentials.txt` object inside the S3 bucket. Now 
 
 Let's say we found an SSRF vector. The first thing we'd normally do is figure out what tech stack it's running on, whether it's Flask, Java, whatever but in this case since we already know it's an `EC2`, we can go straight to the point. To escalate privileges (usually towards an IAM Role) we need to send a request to `169.254.169.254`, which is where the IMDS always lives. Let's try it:
 
-![First request to IMDS](Burp-SSRF.png)
+![First request to IMDS](images/Burp-SSRF.png)
 
 If we hit it, the IMDS service responds with the different metadata API versions, we've got versions ranging from `2007` all the way to `2026 / Latest`. What we actually care about is `Latest` (which is supposed to point to whatever IMDS version is currently running in this context), so let's make a request to `169.254.169.254/latest`:
 
-![Latest endpoint response](Burp-SSRF-Latest.png)
+![Latest endpoint response](images/Burp-SSRF-Latest.png)
 
 And it responds with these 3 entries, let's use this table as a guide:
 ```cpp
@@ -102,7 +102,7 @@ http://169.254.169.254/
 ```
 If we follow the path:
 
-![Credential exfiltration via IMDS](Burp-SSRF-ExfilCredentials.png)
+![Credential exfiltration via IMDS](images/Burp-SSRF-ExfilCredentials.png)
 
 We can see we're able to grab the identity of the `ec2-role-s3` role:
 ```Json
