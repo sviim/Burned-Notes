@@ -11,4 +11,4 @@
 * [SPN Jacking](active-directory/SPN-Jacking/SPN-Jacking.md)
 
 ## Web Application
-* [Coming soon](README.md)
+* [SSRF Steal STS AWS Credentials (IMDSv1)](web-application/ssrf-aws-imdsv1/SSRF-IMDSv1.md)
