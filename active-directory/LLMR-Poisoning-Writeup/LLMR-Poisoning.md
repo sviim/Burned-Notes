@@ -92,33 +92,33 @@ Let's set up a simple lab to see how easy this is in practice. We are on the sam
 
 First, verify connectivity to the DC:
 
-![Ping to DC](images/01-ping-dc.png)
+![Ping to DC](<../../.gitbook/assets/01-ping-dc (1).png>)
 
 Check the network interface and start Responder:
 
-![Responder start](images/02-responder-start.png)
+![Responder start](<../../.gitbook/assets/02-responder-start (1).png>)
 
 The interface used here is `ens33`. Make sure to use your own interface name.
 
 Now, from the victim machine, attempt to access a non-existent network resource in File Explorer:
 
-![Victim File Explorer](images/03-victim-fileexplorer.png)
+![Victim File Explorer](<../../.gitbook/assets/03-victim-fileexplorer (1).png>)
 
 Windows will attempt to authenticate automatically. The victim sees a credentials prompt — this triggers the NTLM handshake:
 
-![Credentials prompt](images/05-victim-credentials-prompt.png)
+![Credentials prompt](<../../.gitbook/assets/05-victim-credentials-prompt (1).png>)
 
 Meanwhile, Responder captures the `NTLMv2` hash of the `Administrator` account:
 
-![Responder captures Administrator hash](images/04-responder-admin-hash.png)
+![Responder captures Administrator hash](<../../.gitbook/assets/04-responder-admin-hash (1).png>)
 
 The victim receives an `Access is denied` error — from their perspective, the resource simply doesn't exist:
 
-![Access denied](images/06-victim-access-denied.png)
+![Access denied](<../../.gitbook/assets/06-victim-access-denied (1).png>)
 
 The same attack works against any domain user. Here, the `s.vim` account triggers the same flow and its hash is captured as well:
 
-![Responder captures s.vim hash](images/07-responder-svim-hash.png)
+![Responder captures s.vim hash](<../../.gitbook/assets/07-responder-svim-hash (1).png>)
 
 Now we attempt to crack the captured hash offline using `Hashcat` with module `5600` (NetNTLMv2):
 
@@ -126,9 +126,9 @@ Now we attempt to crack the captured hash offline using `Hashcat` with module `5
 hashcat -m 5600 hashNTLMv2 /usr/share/seclists/rockyou.txt
 ```
 
-![Hashcat running](images/08-hashcat-start.png)
+![Hashcat running](<../../.gitbook/assets/08-hashcat-start (1).png>)
 
-![Hashcat cracked](images/09-hashcat-cracked.png)
+![Hashcat cracked](<../../.gitbook/assets/09-hashcat-cracked (1).png>)
 
 The password `snake123` was cracked in under **1 second** using `rockyou.txt`. This illustrates why weak passwords in domain environments are critical vulnerabilities — even if every other control is in place, a weak password makes the captured hash trivially exploitable.
 
