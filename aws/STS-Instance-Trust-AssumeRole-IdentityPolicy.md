@@ -16,7 +16,7 @@ aws iam create-instance-profile --instance-profile-name MyProfile
 aws iam add-role-to-instance-profile --instance-profile-name MyProfile --role-name MyRole
 aws ec2 associate-iam-instance-profile --instance-id i-xxxx --iam-instance-profile Name=MyProfile
 ```
-Why does this exist? It's what allows the metadata service (IMDS) at `169.254.169.254` to hand out credentials automatically to the instance, the Instance Profile is the bridge between "this machine" and "this role." This is exactly what we exploited in [[Burned-Notes/AWS/Labs/SSRF IMDSv1 - Steal AWS STS Credentials|SSRF IMDSv1 - Steal AWS STS Credentials]]: the attacker requests credentials from IMDS, and IMDS pulls them from the role attached via the Instance Profile.
+Why does this exist? It's what allows the metadata service (IMDS) at `169.254.169.254` to hand out credentials automatically to the instance, the Instance Profile is the bridge between "this machine" and "this role." This is exactly what we exploited in [SSRF-IMDSv1 Lab](../web-application/ssrf-aws-imdsv1/SSRF-IMDSv1.md): the attacker requests credentials from IMDS, and IMDS pulls them from the role attached via the Instance Profile.
 ## Identity Policy (Permission Policy)
 This is the JSON document that defines what the role (or user/group) can actually do once it has already assumed the identity.
 ```json
@@ -202,14 +202,14 @@ The `Principal` key defines which objects are allowed to assume this role. In th
 ## sts:AssumeRole
 This is the verb/action that actually performs the identity switch, and for it to work it needs the green light from both sides:
 ```cpp
-┌─────────────────┐         sts:AssumeRole          ┌──────────────────┐
-│  Source Role     │ ───────────────────────────────>│  Target Role      │
-│  (compromised)   │                                  │  (admin, e.g.)    │
-│                  │                                  │                   │
-│  Identity Policy │  needs permission for:           │  Trust Policy     │
-│  must allow      │  "sts:AssumeRole" on the         │  must allow       │
-│  the ACTION      │  target role's ARN               │  the PRINCIPAL    │
-└─────────────────┘                                  └──────────────────┘
+┌──────────────────┐         sts:AssumeRole           ┌────────────────┐
+│  Source Role     │ ───────────────────────────────> │  Target Role   │
+│  (compromised)   │                                  │  (admin, e.g.) │
+│                  │                                  │                │
+│  Identity Policy │  needs permission for:           │  Trust Policy  │
+│  must allow      │  "sts:AssumeRole" on the         │  must allow    │
+│  the ACTION      │  target role's ARN               │  the PRINCIPAL │
+└──────────────────┘                                  └────────────────┘
 ```
 Double lock, two different directions:
 - **Source side** (Identity Policy of the compromised role): needs explicit permission to run `sts:AssumeRole` against the target role's ARN.
