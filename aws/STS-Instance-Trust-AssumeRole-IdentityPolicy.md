@@ -201,16 +201,9 @@ There's a lot of info here about the role, but the part that matters most to us 
 The `Principal` key defines which objects are allowed to assume this role. In this case, EC2 instances (though this doesn't mean *every* EC2 instance can assume this role, remember there's this thing called an `Instance Profile` that's the actual link between the role and a specific instance).
 ## sts:AssumeRole
 This is the verb/action that actually performs the identity switch, and for it to work it needs the green light from both sides:
-```
-┌──────────────────┐         sts:AssumeRole           ┌────────────────┐
-│  Source Role     │ ───────────────────────────────> │  Target Role   │
-│  (compromised)   │                                  │  (admin, e.g.) │
-│                  │                                  │                │
-│  Identity Policy │  needs permission for:           │  Trust Policy  │
-│  must allow      │  "sts:AssumeRole" on the         │  must allow    │
-│  the ACTION      │  target role's ARN               │  the PRINCIPAL │
-└──────────────────┘                                  └────────────────┘
-```
+
+![Graph](images/graph.png)
+
 Double lock, two different directions:
 - **Source side** (Identity Policy of the compromised role): needs explicit permission to run `sts:AssumeRole` against the target role's ARN.
 - **Target side** (Trust Policy of the admin role): needs to list the source role as an allowed `Principal`.
